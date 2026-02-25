@@ -59,7 +59,7 @@ else
       --include="*.yml" --include="*.yaml" --include="*.json" --include="*.toml" \
       --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=__pycache__ \
       --exclude-dir=target --exclude-dir=dist --exclude-dir=build \
-      2>/dev/null | head -5)
+      2>/dev/null | head -5) || true
     if [ -n "$MATCHES" ]; then
       FOUND="${FOUND}${MATCHES}\n"
     fi
