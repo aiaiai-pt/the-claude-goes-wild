@@ -1,0 +1,64 @@
+{
+  "$comment": "Merge this into your ~/.claude/settings.json under the 'hooks' key. This configures the Steering Model's hook-based enforcement layer.",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop/secret-scan.sh",
+            "timeout": 30,
+            "statusMessage": "Scanning for secrets..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop/quality-gate.sh",
+            "timeout": 120,
+            "statusMessage": "Running quality gates..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop/explorational-nudge.sh",
+            "timeout": 5,
+            "statusMessage": "Considering..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop/process-nudge.sh",
+            "timeout": 5,
+            "statusMessage": "Checking process coverage..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-tool/bash-guard.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-tool/commit-guard.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ]; then case \"$FILE\" in *.py) command -v ruff >/dev/null 2>&1 && ruff format --quiet \"$FILE\" 2>/dev/null; ruff check --fix --quiet \"$FILE\" 2>/dev/null ;; *.js|*.ts|*.svelte|*.json|*.css|*.html) command -v npx >/dev/null 2>&1 && npx prettier --write \"$FILE\" 2>/dev/null ;; esac; fi; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
