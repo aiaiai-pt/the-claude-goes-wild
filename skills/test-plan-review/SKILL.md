@@ -1,3 +1,9 @@
+---
+name: test-plan-review
+description: Review and improve a spec's test plan to follow the project's testing policy
+allowed-tools: Read, Grep, Glob
+---
+
 # Test Plan Review
 
 Review and improve a spec's test plan to follow the project's testing policy.

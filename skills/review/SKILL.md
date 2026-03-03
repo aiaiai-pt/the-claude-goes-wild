@@ -1,6 +1,7 @@
 ---
 name: review
 description: Review code changes for quality, security, and correctness
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # Code Review

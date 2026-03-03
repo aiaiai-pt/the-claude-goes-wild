@@ -118,15 +118,15 @@ $ARGUMENTS
    d. **Auto memory**: Update the project-specific memory file at
       `~/.claude/projects/<project-key>/memory/MEMORY.md` with key design insights.
       To find the project key, check the current working directory — the project
-      key is the absolute path with `/` replaced by `-` (e.g., `/Users/carlos.oliveira/my-app`
-      becomes `-Users-carlos-oliveira-my-app`). If the memory directory doesn't exist,
+      key is the absolute path with `/` replaced by `-` (e.g., `/Users/jdoe/my-app`
+      becomes `-Users-jdoe-my-app`). If the memory directory doesn't exist,
       create it.
 
    e. **Design-spec-architect agent memory** (for standalone design-spec-architect use):
       If there are learnings about design process, visual language, or component
       patterns that would help when the design-spec-architect agent is used outside
       of DFG workflows (e.g., for quick design specs), update
-      `/Users/carlos.oliveira/.claude/agent-memory/design-spec-architect/MEMORY.md`.
+      `~/.claude/agent-memory/design-spec-architect/MEMORY.md`.
       Only write general design learnings here, not project-specific details.
 
 6. **Report what was captured**:

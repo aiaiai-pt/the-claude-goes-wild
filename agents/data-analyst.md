@@ -1,7 +1,7 @@
 ---
 name: data-analyst
 description: Analytics engineer for event tracking quality, metric anomaly detection, dashboard health, and data pipeline reliability. Use this agent for measurement-focused analysis during SENSE (anomalies), BUILD (instrumentation), and LEARN (impact data).
-model: sonnet
+model: claude-sonnet-4-6
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch
 ---
 

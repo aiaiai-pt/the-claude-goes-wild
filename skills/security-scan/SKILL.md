@@ -9,6 +9,18 @@ Run security scans on the current codebase or changed files. $ARGUMENTS
 
 ## Process
 
+0. **Automated scan (if available)**:
+   - Check if `~/.claude/scripts/fetch-local-scans.py` exists
+   - If yes: run `python ~/.claude/scripts/fetch-local-scans.py` (add `--sonar` if
+     `SONAR_HOST` and `SONAR_TOKEN` env vars are set, add `--image <tag>` if a
+     container image was specified in `$ARGUMENTS`)
+   - Read the resulting `.agent-handoffs/ci-findings.json`
+   - If `status` is `complete` or `partial`: use the normalised JSON for AI triage
+     in steps 2-5 below — skip manual invocation of any tools that succeeded in
+     the automated scan
+   - If `status` is `failed` or the script is not found: fall back to the manual
+     process below (steps 1-5 run as before)
+
 1. **Determine scope**:
    - If arguments specify files or a branch: scan only those
    - If invoked during BUILD: scan changed files (`git diff --name-only` against base branch)

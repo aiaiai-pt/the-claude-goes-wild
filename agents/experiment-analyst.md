@@ -1,7 +1,7 @@
 ---
 name: experiment-analyst
 description: Statistician for experiment design, monitoring, and analysis. Use this agent for causal inference, A/B testing, and statistical rigor during BET (design) and LEARN (analysis).
-model: sonnet
+model: claude-sonnet-4-6
 tools: Read, Grep, Glob, Bash, Write, WebFetch
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: commit
 description: Verify and commit changes with component discovery and quality checks
+disable-model-invocation: true
 ---
 
 # Commit Workflow

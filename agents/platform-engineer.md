@@ -1,7 +1,7 @@
 ---
 name: platform-engineer
 description: Platform engineer for golden path maintenance, CI/CD optimization, DX measurement, and infrastructure drift detection. Use this agent for platform health across all phases.
-model: sonnet
+model: claude-sonnet-4-6
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, Task
 ---
 

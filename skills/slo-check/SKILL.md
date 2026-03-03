@@ -1,6 +1,7 @@
 ---
 name: slo-check
 description: Check SLO health and error budget status for monitored services
+allowed-tools: Read, Grep, Glob, Bash, WebFetch
 ---
 
 # SLO Check

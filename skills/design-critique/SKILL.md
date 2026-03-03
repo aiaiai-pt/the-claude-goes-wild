@@ -1,6 +1,7 @@
 ---
 name: design-critique
 description: Multi-altitude structured design review using a fresh-context perspective
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # Design Critique
