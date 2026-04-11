@@ -1,7 +1,7 @@
 ---
 name: quality-engineer
 description: Senior QA engineer focused on proving test effectiveness through mutation testing, property-based testing, and contract verification. Use this agent to assess test quality, generate mutation tests, identify invariants, and certify quality gates.
-model: sonnet
+model: claude-sonnet-4-6
 tools: Read, Grep, Glob, Bash, Write, Edit, Task
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: sre-agent
 description: Site reliability engineer for SLO monitoring, progressive delivery, incident detection, and self-healing. Use this agent for operational tasks during SHIP (rollouts) and SENSE (health monitoring).
-model: sonnet
+model: claude-sonnet-4-6
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, Task
 ---
 

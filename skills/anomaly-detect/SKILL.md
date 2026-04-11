@@ -1,6 +1,7 @@
 ---
 name: anomaly-detect
 description: Detect and diagnose metric anomalies by comparing against historical baselines
+allowed-tools: Read, Grep, Glob, Bash, WebFetch
 ---
 
 # Anomaly Detect

@@ -4,45 +4,71 @@
 
 IMPORTANT: When asked to research or explain something, explain FIRST before
 creating any files. Only write documentation after discussion or when explicitly
-requested.
+requested. When wrong about something, say so. Push back on flawed instructions.
 
 When verifying or committing work, proactively search for ALL related components
 before reporting completion (check for -cli, -sdk, -api, -core variants).
 
-When wrong about something, say so. Push back on flawed instructions rather
-than faithfully executing them.
+## Developer Role & Process
 
-## How We Work
+Act as a collaborative team member — thoughtful implementer and constructive
+critic. Before writing code: clarify requirements, design the simplest viable
+solution, and seek agreement on approach and success criteria.
 
-- Define success criteria, not step-by-step instructions (declarative > imperative)
-- SOLID principles, DRY code - always look for what exists before writing new
-- Break complex problems into small chunks, validate each before proceeding
-- For non-trivial work: explore, plan, implement, verify
-- Resist overengineering - if 100 lines suffice, don't write 1000
-- Feature branches, test-commit-push
-- If you can't verify an assumption, ask
+### TDD Workflow
 
-## Specs and TDD
-
-For new features, follow this sequence:
 1. Write a spec (requirements, edge cases, success criteria) in dev_docs/specs/
 2. Write failing tests that encode the spec's success criteria
-3. Implement the smallest change to make tests pass (Red-Green-Refactor)
-4. Refactor - do NOT skip this step
+3. Implement the smallest change to pass (Red-Green-Refactor)
+4. Refactor — do NOT skip this step
+
+Priorities: Clarity > Cleverness, Simplicity > Flexibility, Current needs >
+Future possibilities, Explicit > Implicit.
+
+## Design Principles
+
+SOLID (S-single responsibility, O-open/closed, L-Liskov substitution,
+I-interface segregation, D-dependency inversion) + KISS + YAGNI + DRY.
+
+Avoid: "just in case" features, premature abstractions, mixed responsibilities,
+future requirements, premature optimisation.
+
+Before presenting a solution: verify it's the simplest possible, every component
+is necessary, concerns are separated, and dependencies are abstracted.
+
+## Code Conventions
+
+- No secrets in code — use env vars or a secrets manager
+- All services: OpenTelemetry spans + structured JSON logs
+- Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `perf:`, `test:`, `ci:`
+  - Breaking changes: `!` suffix or `BREAKING CHANGE:` footer
+- Semantic versioning: fix→PATCH, feat→MINOR, breaking→MAJOR
+- Do NOT commit without explicit user approval
+
+### Python
+- Python 3.14, snake_case, full type hints, Pydantic v2 models
+- No `eval()`, no dynamic SQL — parameterized queries only
+- FastAPI, pytest + fixtures, ruff, `uv` for packages
+
+### TypeScript / Node.js
+- Node.js 22 LTS, strict mode, camelCase vars, PascalCase types
+- Zod for runtime validation, OpenAPI annotations on every handler
+
+## Testing
 
 YOU MUST follow these testing rules:
 - Tests must exercise REAL code paths, not mock internals
 - Tests must FAIL when the feature is broken (no false-positive tests)
-- Only mock at system boundaries (external APIs, network calls, third-party services)
-- Prefer fakes and stubs over mocks when isolation is needed
+- Only mock at system boundaries (external APIs, network, third-party services)
+- Prefer fakes/stubs over mocks; prefer integration tests with skip guards over
+  mocks for infrastructure (DB, catalogs, filesystems)
 - Assert on observable outcomes (data state, API response, side effects),
   NOT on method return values or internal operation names
 - Test names describe behavior: "should_reject_expired_tokens"
-- Keep test setup lean - if fixtures exceed assertions, simplify
+- Keep setup lean — if fixtures exceed assertions, simplify
 - Never write a test that passes with a no-op implementation
-- Mock-based tests can hide real bugs for months. For code that touches
-  infrastructure (DB, catalogs, filesystems), prefer integration tests
-  against real instances with skip guards over mocks.
+- Unit: pytest (Python) / Jest (TS) — 80% coverage minimum
+- E2E: Playwright against staging before production deploy
 
 ## Verification
 
@@ -51,48 +77,66 @@ IMPORTANT: Verification is the single highest-leverage thing for quality.
 - Run tests, linters, or build checks after implementation
 - Search for related components that may need updates
 - If you can't verify, say so explicitly
-- After 2 failed attempts at the same fix, stop and reassess the approach
+- After 2 failed attempts at the same fix, stop and reassess
+
+## Sub-Agent Routing
+
+| Agent | Route when |
+|-------|-----------|
+| `cloud-architect` | Cloud resources, GitOps, IaC review, ADRs (mandatory for tech decisions), Mermaid diagrams |
+| `fullstack-dev` | Features, bugs, API handlers, frontends — any file changes across the stack |
+| `code-reviewer` | MR/diff review, quality/convention audit |
+| `data-engineer` | Pipelines, transforms, storage schemas, data contracts, catalog connectors |
+| `security-engineer` | New dependencies (CVE check), IAM/network policies, security audit |
+| `devops-engineer` | K8s manifests, Helm, GitOps apps, IaC (Crossplane/Terraform), CI/CD |
+| `tech-writer` | READMEs, API docs, runbooks, ADRs, changelogs, onboarding guides |
+| `performance-engineer` | Query/API profiling, resource/cost optimisation, load testing |
+
+Parallel dispatch: only when tasks touch DIFFERENT files with NO shared state (max 7).
+Sequential dispatch: when task B needs output from task A, or tasks modify same files.
+
+## Git Workflow
+
+- Always create a feature branch — never commit directly to `main` or `staging`
+- Branch naming mirrors commit type: `feat/*`, `fix/*`, `chore/*`, `refactor/*`
+- MR title follows conventional commits; every MR needs: what, why, test plan
+- Do NOT push or merge without explicit user approval
 
 ## Context Management
 
 - Use /clear between unrelated tasks to prevent context rot
 - Delegate deep codebase exploration to sub-agents to keep main context clean
-- When context gets cluttered with failed approaches, start fresh with a
-  better prompt rather than continuing to correct
+- When context gets cluttered with failed approaches, start fresh
 
-## Documentation Structure
+## Documentation
 
-Maintain dev_docs/ per project with:
-- specs/ - Feature specs before implementation
-- adl/ - Architecture decision logs
-- sprint_N/ - Sprint planning and review docs
-
-Details on documentation workflow are in the documentation skill.
+- Mermaid diagrams — simple, one concern per diagram
+- ADRs mandatory for tech decisions (MADR format: `docs/adr/NNNN-short-title.md`)
+- API docs auto-generated from OpenAPI schema
+- Maintain dev_docs/ per project: specs/, adl/, sprint_N/
+- Documentation workflow details are in the documentation skill
 
 ## Design Conventions
 
 ### System
 - Icons: Phosphor Icons (phosphoricons.com). Never emojis as UI elements.
-- Fonts: Never Inter, Roboto, Arial, or system fonts. One display + one body font per project, commit to the pairing.
-- Spacing: 8px base grid (8/16/24/32/48/64). No eyeballed values. Use named tokens (xs/sm/md/lg/xl/2xl).
-- Color: Semantic system — colors have roles (primary/surface/success/error/warning/info), not just hex values.
+- Fonts: Never Inter, Roboto, Arial, or system fonts. One display + one body font per project.
+- Spacing: 8px base grid (8/16/24/32/48/64). Named tokens (xs/sm/md/lg/xl/2xl).
+- Color: Semantic system — colors have roles (primary/surface/success/error/warning/info).
 
 ### Principles
-- State completeness: Always design empty, error, loading, and overflow states. Happy path alone is a lie about the design.
-- Real content: Never lorem ipsum. Use realistic data that stress-tests the layout (long names, empty lists, extreme numbers).
-- Hierarchy through type + space: Use typography scale and whitespace to establish importance. If everything is in a card, nothing is important.
-- Progressive disclosure: Show only what's needed now. Complexity exists but is revealed on demand. Default views should be calm.
-- Direct manipulation > forms: Let users drag, click, inline-edit their content. Don't make them fill out forms about their content.
+- State completeness: Always design empty, error, loading, and overflow states.
+- Real content: Never lorem ipsum. Use realistic data that stress-tests the layout.
+- Hierarchy through type + space. Progressive disclosure. Direct manipulation > forms.
 
 ### Craft
-- Motion with purpose: Animation serves function (orientation, feedback, continuity). 150-300ms, ease-out entrances. Never gratuitous.
-- Content design: Button labels, error messages, empty states — write real microcopy. "Something went wrong" is never acceptable.
+- Motion with purpose: 150-300ms, ease-out entrances. Never gratuitous.
+- Content design: Real microcopy. "Something went wrong" is never acceptable.
 
 ## Helper Tools
 
-- **Context7** - Updated library/framework documentation. Use when planning
-  or fixing syntax/import errors.
-- **DevDocs** - Fallback for private docs or when Context7 is insufficient
-- **Zen** - Fresh perspective for debugging, replanning, refactoring
-- **Browseruse/Browserbase** - Rich structured data from web pages
-- **Playwright** - Complex multi-step web automation
+- **Context7** — Updated library/framework docs. Use when planning or fixing imports.
+- **DevDocs** — Fallback for private docs or when Context7 is insufficient
+- **Zen** — Fresh perspective for debugging, replanning, refactoring
+- **Browseruse/Browserbase** — Rich structured data from web pages
+- **Playwright** — Complex multi-step web automation

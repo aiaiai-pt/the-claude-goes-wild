@@ -1,6 +1,7 @@
 ---
 name: dx-measure
 description: Measure developer experience using DORA metrics and quantitative DX signals
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # DX Measure

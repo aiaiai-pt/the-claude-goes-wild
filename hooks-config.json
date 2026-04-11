@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/settings-schema.json",
   "$comment": "Merge this into your ~/.claude/settings.json under the 'hooks' key. This configures the Steering Model's hook-based enforcement layer.",
   "hooks": {
     "Stop": [
@@ -45,6 +46,16 @@
             "type": "command",
             "command": "~/.claude/hooks/pre-tool/commit-guard.sh",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-tool/sensitive-file-guard.sh",
+            "timeout": 5
           }
         ]
       }

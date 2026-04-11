@@ -12,9 +12,11 @@
 # What it does:
 #   1. Symlinks CLAUDE.md → ~/.claude/CLAUDE.md
 #   2. Symlinks agents/*.md → ~/.claude/agents/*.md
-#   3. Symlinks commands/*.md → ~/.claude/commands/*.md
+#   3. Symlinks commands/*.md → ~/.claude/commands/*.md (legacy, kept for compat)
 #   4. Symlinks skills/*/SKILL.md → ~/.claude/skills/*/SKILL.md
 #   5. Symlinks hooks/{stop,pre-tool}/*.sh → ~/.claude/hooks/{stop,pre-tool}/*.sh
+#   6. Symlinks scripts/*.py and scripts/*.sh → ~/.claude/scripts/, chmod +x
+#   7. Symlinks templates/ tree → ~/.claude/templates/ preserving structure
 #
 # What it does NOT do:
 #   - Touch ~/.claude/settings.json (hooks config must be merged manually)
@@ -90,7 +92,7 @@ for f in "$REPO_DIR"/agents/*.md; do
 done
 echo ""
 
-# 3. Commands
+# 3. Commands (legacy — kept for backward compatibility)
 echo "[Commands]"
 for f in "$REPO_DIR"/commands/*.md; do
   [ -f "$f" ] || continue
@@ -117,10 +119,33 @@ for hook_type in stop pre-tool; do
 done
 echo ""
 
-# 6. Reminder about hooks config
+# 6. Scripts
+echo "[Scripts]"
+mkdir -p "$CLAUDE_DIR/scripts"
+for f in "$REPO_DIR"/scripts/*.py "$REPO_DIR"/scripts/*.sh; do
+  [ -f "$f" ] || continue
+  link_file "$f" "$CLAUDE_DIR/scripts/$(basename "$f")"
+done
+# Ensure scripts are executable
+for f in "$CLAUDE_DIR"/scripts/*.py "$CLAUDE_DIR"/scripts/*.sh; do
+  [ -f "$f" ] && chmod +x "$f" 2>/dev/null || true
+done
+echo ""
+
+# 7. Templates
+echo "[Templates]"
+if [ -d "$REPO_DIR/templates" ]; then
+  while IFS= read -r -d '' f; do
+    rel="${f#"$REPO_DIR/templates/"}"
+    link_file "$f" "$CLAUDE_DIR/templates/$rel"
+  done < <(find "$REPO_DIR/templates" -type f -print0)
+fi
+echo ""
+
+# 8. Reminder about hooks config and dependencies
 echo "=============================="
 echo ""
-echo "Symlinks created. Two manual steps remain:"
+echo "Symlinks created. Manual steps remain:"
 echo ""
 echo "  1. HOOKS CONFIG: Merge hooks-config.json into your"
 echo "     ~/.claude/settings.json under the 'hooks' key."
@@ -130,5 +155,9 @@ echo "  2. TOOL DEPENDENCIES: Install the tools the hooks expect:"
 echo "     brew install gitleaks jq"
 echo "     pip install ruff  (or: pipx install ruff)"
 echo "     npm install -g prettier"
+echo ""
+echo "  3. SCAN TOOLS (optional — for /scan and /orchestrate):"
+echo "     pip install semgrep"
+echo "     brew install trivy"
 echo ""
 echo "Done."
