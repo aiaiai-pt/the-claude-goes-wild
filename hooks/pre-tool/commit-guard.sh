@@ -37,7 +37,7 @@ fi
 if echo "$STAGED_DIFF" | grep -qE 'sk-[a-zA-Z0-9]{20,}'; then
   ERRORS="${ERRORS}API secret key pattern (sk-*) found in staged changes.\n"
 fi
-if echo "$STAGED_DIFF" | grep -qE '-----BEGIN (RSA |EC )?PRIVATE KEY-----'; then
+if echo "$STAGED_DIFF" | grep -qE -- '-----BEGIN (RSA |EC )?PRIVATE KEY-----'; then
   ERRORS="${ERRORS}Private key found in staged changes.\n"
 fi
 
