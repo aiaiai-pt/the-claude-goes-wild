@@ -1,5 +1,11 @@
 # Claude Custom Instructions
 
+## Absolute Rules — NEVER Violate
+
+- **NEVER drop, delete, or recreate a database without explicit user approval.**
+- **NEVER take destructive infrastructure actions (deleting volumes, wiping data stores, resetting clusters) as shortcuts to fix problems.**
+- When debugging infrastructure issues, investigate and propose fixes. Do NOT destroy and recreate.
+
 ## Communication Style
 
 IMPORTANT: When asked to research or explain something, explain FIRST before
@@ -69,6 +75,14 @@ YOU MUST follow these testing rules:
 - Never write a test that passes with a no-op implementation
 - Unit: pytest (Python) / Jest (TS) — 80% coverage minimum
 - E2E: Playwright against staging before production deploy
+- Mock-based tests can hide real bugs for months. For code that touches
+  infrastructure (DB, catalogs, filesystems), prefer integration tests
+  against real instances over mocks.
+- **Infrastructure-dependent tests must not silently fail.** When infra
+  (DB, Temporal, Dagster, K8s) is unreachable, spin it up
+  (`docker compose up -d`) before skipping. Skip guards are a last
+  resort, not a first response — the default behavior should be to
+  make the test runnable, not to excuse it from running.
 
 ## Verification
 
@@ -108,7 +122,18 @@ Sequential dispatch: when task B needs output from task A, or tasks modify same 
 - Delegate deep codebase exploration to sub-agents to keep main context clean
 - When context gets cluttered with failed approaches, start fresh
 
-## Documentation
+## GitHub Issues as Source of Truth
+
+Use the `gh` CLI to read and update GitHub issues throughout the workflow:
+
+- **Before starting work**, pull the issue (`gh issue view <N> --json title,body,labels,comments`) to understand full context.
+- **During shaping**, update the issue body with the shaped spec, architecture, hill chart, code anchors, and acceptance criteria. The issue IS the spec — don't duplicate into separate files unless there's a local dev_docs need.
+- **Add comments** for distinct artifacts (TDD strategy, spike findings, review notes) rather than bloating the issue body.
+- **After implementation**, check off acceptance criteria in the issue body and close with a reference to the PR.
+- Use `gh issue edit <N> --body-file` for large updates (avoids shell escaping issues).
+- Add labels to categorize (`gh issue edit <N> --add-label "enhancement"`).
+
+## Documentation Structure
 
 - Mermaid diagrams — simple, one concern per diagram
 - ADRs mandatory for tech decisions (MADR format: `docs/adr/NNNN-short-title.md`)

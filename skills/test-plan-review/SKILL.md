@@ -56,6 +56,9 @@ For each test in the plan, check:
 8. **Wrong tier?** A test marked as CI that requires real external calls, or a test marked as eval that only uses mocks.
 9. **Asserts on return values instead of outcomes?** `assert result["operation"] == "set_current_snapshot"` tests code, not behavior. Reframe: what observable state changed? What data exists now? What can the user see?
 10. **Mocks infrastructure that could be real?** If the test mocks DB, Iceberg, Trino, or other infrastructure that's available behind a skip guard, it's hiding potential bugs. Prefer integration tests with `@pytest.mark.skipif(not infra_available)` over mocks that pass while real code is broken.
+11. **Circular assertion?** `assert data["count"] == result["count"]` — both sides come from the same state object. If both are wrong, the test passes. Use concrete expected values: `assert data["count"] == 42`.
+12. **Hidden fixture dependency?** Test relies on seed scripts or external state (seeded DB rows, config files) without declaring or creating that state in a fixture. The test will fail on a clean environment with a confusing error.
+13. **`pytest.raises(Exception)` too broad?** Catches any error including import errors and typos. Use the specific exception type (`ValidationError`, `ValueError`, `HTTPException`).
 
 ## Process
 
@@ -64,7 +67,13 @@ For each test in the plan, check:
 3. **Check for `tests/eval_utils.py`** — if it exists, verify the eval tests use it. If not, flag it as a prerequisite to create.
 4. **Review each test** against the 10 smell checks above.
 5. **Classify each test into tiers** — is it Tier 1, 2, or 3? Is it in the right tier?
-6. **Identify missing tests:**
+6. **Assess mutation testing readiness:**
+   - Identify the critical code paths (auth guards, tenant isolation, state transitions, error classification)
+   - Check that tests use concrete expected values, not circular comparisons (`data["x"] == result["x"]` is circular — use `data["x"] == 42`)
+   - Check that tests would fail if the feature code were deleted or no-op'd
+   - Flag any test that only asserts mock call counts without verifying observable outcomes
+   - Recommend specific files for `/mutation-test` in Phase 4 of LFG
+7. **Identify missing tests:**
    - Missing error/failure paths for external calls
    - Missing eval tests for LLM interactions
    - Missing contract tests for data round-trips
@@ -90,6 +99,12 @@ For each test in the plan, check:
 - LLM calls in feature: [list]
 - Eval tests covering them: [list or MISSING]
 - eval_utils.py status: exists / NEEDS CREATION
+
+### Mutation Testing Readiness
+- Critical code paths identified: [list]
+- Tests use concrete assertions (not circular/mock-only): [yes/no]
+- Recommended `/mutation-test` targets: [files]
+- Estimated mutation score: [high/medium/low based on test quality]
 
 ### Verdict
 [Ready / Needs revision] — [summary of changes needed]

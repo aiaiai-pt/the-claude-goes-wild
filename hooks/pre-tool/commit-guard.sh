@@ -23,8 +23,8 @@ if [ -n "$STAGED_ENV" ]; then
   ERRORS="${ERRORS}Staged .env file(s) detected: $STAGED_ENV. Remove from staging.\n"
 fi
 
-# Check for common credential file patterns in staging
-STAGED_CREDS=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null | grep -iE '(credentials|secrets|\.pem|\.key|\.p12|\.pfx|id_rsa)' || true)
+# Check for actual credential/secret files (not source code in dirs named "credentials")
+STAGED_CREDS=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null | grep -iE '(credentials\.(json|yaml|yml|xml|toml|ini|cfg|conf|txt|csv)$|secrets\.(json|yaml|yml|xml|toml|ini|cfg|conf|txt|csv)$|\.pem$|\.key$|\.p12$|\.pfx$|id_rsa)' || true)
 if [ -n "$STAGED_CREDS" ]; then
   ERRORS="${ERRORS}Staged credential file(s) detected: $STAGED_CREDS. Verify this is intentional.\n"
 fi

@@ -23,9 +23,9 @@ if echo "$COMMAND" | grep -qE 'rm\s+-rf\s+(/|~/|\$HOME|/usr|/etc|/var)'; then
   exit 0
 fi
 
-# Drop database
+# Drop database / schema / truncate — prompt for approval (not hard deny)
 if echo "$COMMAND" | grep -qiE '(drop\s+database|drop\s+schema|truncate\s+)'; then
-  echo '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Database destructive command blocked. Requires explicit user approval."}}'
+  echo '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"Database destructive command detected (DROP/TRUNCATE). Approve to proceed."}}'
   exit 0
 fi
 

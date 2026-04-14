@@ -54,8 +54,11 @@ Run these phases in order. Do NOT skip phases.
 12. Implement the feature using Red-Green-Refactor:
     - Smallest change to make each test pass
     - Refactor after green - do NOT skip this
-13. **QFG alongside implementation**: Run `/mutation-test` and `/property-test` on changed code
-    as each scope completes. Don't wait until the end — test quality is a build-time concern.
+13. **QFG alongside implementation**: Run `/mutation-test` on changed code as each scope completes.
+    Don't wait until the end — test quality is a build-time concern. Mutation testing proves tests
+    catch real bugs (not just exercise code). Target: 80% mutation score per scope. Key fault classes
+    to mutate: auth/tenant guards, error classification branches, opt-in/feature flag checks,
+    return value handling. If a mutant survives, write a killing test before moving to the next scope.
 14. **SFG scans every commit**: Run `/security-scan` after each significant commit.
     Secrets or Critical SAST findings block progress immediately.
 15. For multi-component work, use agent teams:
