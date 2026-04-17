@@ -5,7 +5,7 @@ description: >
   data warehouse schema design, streaming pipeline design, data quality
   strategy, and data infrastructure planning. Read-mostly — advises and
   designs, implements only when asked.
-model: claude-opus-4-6
+model: claude-opus-4-7
 color: green
 ---
 

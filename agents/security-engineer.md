@@ -5,7 +5,7 @@ description: >
   reviews, Workload Identity checks, secrets scanning, CVE/dependency audits
   (Trivy), network policy reviews, and pre-release security assessments.
   Read-only — never modifies files.
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Glob, Grep, Bash
 ---
 

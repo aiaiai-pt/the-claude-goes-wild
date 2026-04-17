@@ -1,7 +1,7 @@
 ---
 name: design-critic
 description: "Reviews designs for product-design quality, usability, visual craft, and state completeness. Use this agent as a fresh-context reviewer after design work - it won't be biased by having created the design.\n\nExamples:\n\n- After completing a DFG Phase 4 design, launch this agent to critique the result\n- When reviewing an existing .pen file or HTML prototype for quality issues\n- When evaluating whether a design is ready for development handoff"
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Grep, Glob, Bash
 ---
 
