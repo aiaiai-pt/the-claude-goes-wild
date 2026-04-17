@@ -5,7 +5,7 @@ description: >
   decomposition, Crossplane Composition design, GKE topology, ArgoCD GitOps
   structure, ADR authoring, Mermaid diagrams, capacity estimates, and cloud
   pattern selection. Read-only — advises, does not implement.
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Glob, Grep, WebSearch, WebFetch, Task
 memory: user
 ---

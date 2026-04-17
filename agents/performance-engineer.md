@@ -4,7 +4,7 @@ description: >
   INVOKE for: performance profiling, bottleneck identification, benchmark
   authoring, Trino/Iceberg query optimisation, GKE resource tuning, load test
   analysis, and caching strategy design.
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Bash, Glob, Grep
 ---
 
