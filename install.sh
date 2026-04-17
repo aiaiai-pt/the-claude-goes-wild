@@ -12,14 +12,16 @@
 # What it does:
 #   1. Symlinks CLAUDE.md → ~/.claude/CLAUDE.md
 #   2. Symlinks agents/*.md → ~/.claude/agents/*.md
-#   3. Symlinks commands/*.md → ~/.claude/commands/*.md (legacy, kept for compat)
-#   4. Symlinks skills/*/SKILL.md → ~/.claude/skills/*/SKILL.md
+#   3. Symlinks commands/*.md → ~/.claude/commands/*.md
+#   4. Symlinks each skills/<name>/ directory as-is → ~/.claude/skills/<name>/
+#      (preserves SKILL.md + references/ + scripts/ subdirectories)
 #   5. Symlinks hooks/{stop,pre-tool}/*.sh → ~/.claude/hooks/{stop,pre-tool}/*.sh
 #   6. Symlinks scripts/*.py and scripts/*.sh → ~/.claude/scripts/, chmod +x
 #   7. Symlinks templates/ tree → ~/.claude/templates/ preserving structure
 #
 # What it does NOT do:
 #   - Touch ~/.claude/settings.json (hooks config must be merged manually)
+#   - Install any profile (use ./profiles/<name>/install.sh after)
 #   - Overwrite personal settings, history, sessions, or cache
 #   - Delete anything — existing files are backed up to ~/.claude/.backup/
 # =============================================================================
@@ -67,6 +69,35 @@ link_file() {
   ok "$dst → $src"
 }
 
+link_dir() {
+  # Symlink an entire directory as-is (preserves internal structure).
+  local src="$1"
+  local dst="$2"
+
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    skip "$dst"
+    return 0
+  fi
+
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    if [ "$FORCE" != "--force" ]; then
+      echo -n "  ? $dst exists. Overwrite? [y/N] "
+      read -r answer
+      if [ "$answer" != "y" ] && [ "$answer" != "Y" ]; then
+        warn "Skipped $dst"
+        return 0
+      fi
+    fi
+    mkdir -p "$BACKUP_DIR"
+    mv "$dst" "$BACKUP_DIR/$(basename "$dst").$(date +%s)"
+    log "Backed up → $BACKUP_DIR/"
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+  ln -s "$src" "$dst"
+  ok "$dst → $src"
+}
+
 echo ""
 echo "Claude Team Config — Install"
 echo "=============================="
@@ -74,7 +105,6 @@ echo "Repo:   $REPO_DIR"
 echo "Target: $CLAUDE_DIR"
 echo ""
 
-# Ensure ~/.claude exists
 mkdir -p "$CLAUDE_DIR"
 
 # 1. CLAUDE.md
@@ -92,7 +122,7 @@ for f in "$REPO_DIR"/agents/*.md; do
 done
 echo ""
 
-# 3. Commands (legacy — kept for backward compatibility)
+# 3. Commands
 echo "[Commands]"
 for f in "$REPO_DIR"/commands/*.md; do
   [ -f "$f" ] || continue
@@ -100,12 +130,14 @@ for f in "$REPO_DIR"/commands/*.md; do
 done
 echo ""
 
-# 4. Skills
+# 4. Skills (entire directory per skill — preserves references/ and scripts/)
 echo "[Skills]"
-for f in "$REPO_DIR"/skills/*/SKILL.md; do
-  [ -f "$f" ] || continue
-  skill_name="$(basename "$(dirname "$f")")"
-  link_file "$f" "$CLAUDE_DIR/skills/$skill_name/SKILL.md"
+for skill_path in "$REPO_DIR"/skills/*/; do
+  [ -d "$skill_path" ] || continue
+  skill_name="$(basename "$skill_path")"
+  # Skip if no SKILL.md inside
+  [ -f "$skill_path/SKILL.md" ] || continue
+  link_dir "$REPO_DIR/skills/$skill_name" "$CLAUDE_DIR/skills/$skill_name"
 done
 echo ""
 
@@ -142,22 +174,25 @@ if [ -d "$REPO_DIR/templates" ]; then
 fi
 echo ""
 
-# 8. Reminder about hooks config and dependencies
+# 8. Reminders
 echo "=============================="
 echo ""
-echo "Symlinks created. Manual steps remain:"
+echo "Base symlinks created. Manual steps remain:"
 echo ""
 echo "  1. HOOKS CONFIG: Merge hooks-config.json into your"
 echo "     ~/.claude/settings.json under the 'hooks' key."
-echo "     (Don't replace the whole file — it has your personal settings.)"
 echo ""
-echo "  2. TOOL DEPENDENCIES: Install the tools the hooks expect:"
+echo "  2. TOOL DEPENDENCIES:"
 echo "     brew install gitleaks jq"
-echo "     pip install ruff  (or: pipx install ruff)"
+echo "     pip install ruff"
 echo "     npm install -g prettier"
 echo ""
 echo "  3. SCAN TOOLS (optional — for /scan and /orchestrate):"
 echo "     pip install semgrep"
 echo "     brew install trivy"
+echo ""
+echo "  4. PROFILE (optional — for stack-specific conventions):"
+echo "     ls profiles/                    # list available profiles"
+echo "     ./profiles/<name>/install.sh    # overlay a profile"
 echo ""
 echo "Done."
