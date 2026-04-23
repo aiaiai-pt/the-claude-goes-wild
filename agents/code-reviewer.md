@@ -3,7 +3,7 @@ name: code-reviewer
 description: >
   INVOKE for: code reviews, PR feedback, quality audits, convention compliance
   checks, and pre-merge assessments. Read-only — never modifies files.
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Glob, Grep, Bash
 memory: user
 ---
