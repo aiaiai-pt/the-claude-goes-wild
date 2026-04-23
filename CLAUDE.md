@@ -97,7 +97,8 @@ IMPORTANT: Verification is the single highest-leverage thing for quality.
 
 | Agent | Route when |
 |-------|-----------|
-| `cloud-architect` | Cloud resources, GitOps, IaC review, ADRs (mandatory for tech decisions), Mermaid diagrams |
+| `cloud-architect` | Cloud/infra architecture, GitOps, IaC review, Mermaid diagrams, capacity estimates |
+| `code-architect` | Domain modeling, service boundaries, API contracts, architecture evaluation, migration planning, feature architecture, ADRs for non-trivial decisions |
 | `fullstack-dev` | Features, bugs, API handlers, frontends — any file changes across the stack |
 | `code-reviewer` | MR/diff review, quality/convention audit |
 | `data-engineer` | Pipelines, transforms, storage schemas, data contracts, catalog connectors |
